@@ -1,6 +1,6 @@
 [
     {
-        "sprite": "",
+        "sprite": "enemy1",
         "name": "Metal Gear",
         "description": "You would think it would be a little more imposing, given the name...",
         "count": 10,

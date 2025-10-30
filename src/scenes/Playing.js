@@ -125,27 +125,100 @@ export class Playing extends Phaser.Scene {
 
         // physics
         //checking player bullets colliding with enemies
-        this.physics.world.overlap(this.player.bullet_list, this.enemies, (b,e) => {e.destroy(true); b.destroy(true); this.player.score++; this.checkLevelUp(); });
+        this.physics.world.overlap(this.player.bullet_list, this.enemies, (b,e) => {
+            b.destroy(true); e.hp-=b.damage; 
+            let tex = "damage_meteor";
+            let collide = this.add.sprite(b.x, b.y, tex);
+            delayedCall(500, () => {collide.destroy(true)});
+            if (e.hp <= 0) {this.player.score++; this.checkLevelUp(); }});
         
         // checking enemy bullets colliding with player
-        this.physics.world.overlap(this.player, this.enemies_bullet_list, (p,b) => { p.hp -= b.damage; b.destroy(true); this.checkEndGame(); });
+        this.physics.world.overlap(this.player, this.enemies_bullet_list, (p,b) => { p.hp -= b.damage; b.destroy(true); 
+            let tex;
+            switch(e.damage) { // 5, 7 , 12, 18
+                case 5:
+                    tex = "damage_enemy1";
+                    break;
+                case 7:
+                    tex = "damage_enemy2";
+                    break;
+                case 12:
+                    tex = "damage_enemy3";
+                    break;
+                case 18:
+                    tex = "damage_enemy4";
+                    break;
+            }
+            let collision = this.add.sprite(b.x, b.y, tex);
+
+            delayedCall(500, () => {collision.destroy(true)});
+            this.checkEndGame(); });
         
         // checking enemies colliding with player (arcade rules, player loses health)
-        this.physics.world.overlap(this.player, this.enemies, (p, e) => {});
+        this.physics.world.overlap(this.player, this.enemies, (p, e) => {p.hp -= (e.damage * 1.5); 
+            let tex;
+            switch(e.damage) { // 5, 7 , 12, 18
+                case 5:
+                    tex = "damage_enemy1";
+                    break;
+                case 7:
+                    tex = "damage_enemy2";
+                    break;
+                case 12:
+                    tex = "damage_enemy3";
+                    break;
+                case 18:
+                    tex = "damage_enemy4";
+                    break;
+            }
+            let collision = this.add.sprite(b.x, b.y, tex);
+            delayedCall(500, () => {collision.destroy(true)});
+            this.player.tint = 0xff0000; // copies from the demo game
+            this.time.delayedCall(500, () => { this.player.tint = 0xffffff; });
+            e.destroy(true); this.checkEndGame(); });
+        // it hurts more for ships to crash into you
 
         // checking meteors colliding with player (player loses health)
-        this.physics.world.overlap(this.player, this.meteors, (p, m) => {});
-        
-        // checking player bullets colliding with meteors
-        this.physics.world.overlap(this.player.bullet_list, this.meteors, (b,m) => {if (b.type == "missile") {m.destroy(true); b.destroy(true);
-            this.player.score += 2; this.checkLevelUp();
-        }}); // maybe if instead the type is bullet there is a little collision animation
-    }
+        this.physics.world.overlap(this.player, this.meteors, (p, m) => {p.hp -= m.damage; 
+            
+            let tex = "damage_meteor"; // texture of collision, there are 4 textures
+            b.destroy(true); let collide = this.add.sprite(b.x, b.y, tex);
+            delayedCall(500, () => {collide.destroy(true)});
+            m.destroy(true); this.checkEndGame(); });
+        // meteors should do a good bit of damage
 
+        // checking player bullets colliding with meteors
+        this.physics.world.overlap(this.player.bullet_list, this.meteors, (b,m) => {
+            
+            let tex = "damage_meteor"; // texture of collision, there are 4 textures
+            b.destroy(true); let collide = this.add.sprite(b.x, b.y, tex);
+            delayedCall(500, () => {collide.destroy(true)});
+            
+            if (b.type == "missile") {
+                m.destroy(true); b.destroy(true);
+                this.player.score += 2; this.checkLevelUp();
+            }
+            
+        }); // maybe if instead the type is bullet there is a little collision animation
+    }
+/*
+  
+*/
     addEnemies() {
-        const spawns = this.cache.json.get("spawns"); // read the spawn list json
-        let index = Math.floor(Math.random()*spawns.length); // pick a random enemy
-        const spawn = spawns[index]; // generate the enemy data
+
+        // JSON LIST IS NOT NECESSARY  
+
+        /*
+        The enemy constructor, using the enemy type, will determine the enemy stats
+        */
+        let e_count = 3;
+        e_count += this.round * 4;
+
+        let t = "enemy1";
+
+        for (let a = 0; a < e_count; a++) {
+            const e = new Enemy(this, 100 * a, 0, t)
+        }
 
 
 

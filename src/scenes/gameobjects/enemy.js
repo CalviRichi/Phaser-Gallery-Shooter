@@ -6,25 +6,56 @@ import { Bullet } from "./bullet.js"
 // 
 
 export class Enemy extends Phaser.GameObjects.PathFollower {
-    constructor(scene, x, y, which, direction, speed, attack_rate, bullet_speed, damage, target, time) {
-
-        super(scene, x, y, which);
+    constructor(scene, path, x, y, which, direction, time) {
+        // scene, path, x, y, tex, anim
+        super(scene, path, x, y, which);
 
         // enemy specific stats
         switch(which) { // rather than pass in 1000,000 variables, the sprite will determine the stats
+            // damage scales by 1.5
             case "enemy1":
-                this.speed = speed;
-                this.attack_rate = attack_rate;
-                this.bullet_speed = bullet_speed;
-                this.damage = damage;
+                this.speed = 200;
+                this.hp = 5; // will die in one bullet hit
+                this.attack_rate = 8000;
+                this.bullet_speed = 800;
+                this.damage = 5;
                 break;
             case "enemy2":
+                this.speed = 250;
+                this.hp = 8; 
+                this.attack_rate = 8500;
+                this.bullet_speed = 800;
+                this.damage = 7;
                 break;
             case "enemy3":
+                this.speed = 300;
+                this.hp = 12; 
+                this.attack_rate = 9000;
+                this.bullet_speed = 800;
+                this.damage = 12;
                 break;
-            case "enemy4":
+            case "enemy4": // needs missiles 
+                this.speed = 220;
+                this.hp = 15; 
+                this.attack_rate = 1200;
+                this.bullet_speed = 1000;
+                this.damage = 18;
                 break;
         }
+
+        /*
+        {
+        "sprite": "enemy1",
+        "name": "Metal Gear",
+        "description": "You would think it would be a little more imposing, given the name...",
+        "count": 10,
+        "speed": 200,
+        "attack_rate": 8000,
+        "bullet_speed": 800,
+        "damage": 5,
+        "target": "player"
+        }
+        */
 
         //general stats
         scene.add.existing(this);
