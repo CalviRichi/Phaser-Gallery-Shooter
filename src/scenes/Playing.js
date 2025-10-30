@@ -33,10 +33,7 @@ export class Playing extends Phaser.Scene {
     create() {
         // initialization stage 
         // resolution 1280 x 720 -> middle of the screen is 640 x 320 ish
-        const path = new Phaser.Curves.Path(100,100);
-        path.lineTo(400,100).lineTo(400,300).lineTo(100,300).closePath();
-
-        //const sprite = this.add.follower(path, 100, 100, "name"); // where name is a sprite
+        
         //this.background = this.add.sprite(640, 320, 'background');
 
         this.player = new Player(this, 640, 620, "ship_1"); // using my player class
@@ -126,8 +123,9 @@ export class Playing extends Phaser.Scene {
 
         if (this.enemies.children.entries.length == 0)
         {
-            this.addEnemies();
-            //this.round++;
+            this.round++;
+            this.addEnemies(time);
+            
         }
 
         // physics
@@ -216,7 +214,7 @@ export class Playing extends Phaser.Scene {
 /*
   
 */
-    addEnemies() {
+    addEnemies(time) {
 
         // JSON LIST IS NOT NECESSARY  
 
@@ -228,21 +226,45 @@ export class Playing extends Phaser.Scene {
 
         // PATH LOGIC NEEDS TO GO HERE
 
+        /**
+         *  const path = new Phaser.Curves.Path(100,100);
+            path.lineTo(400,100).lineTo(400,300).lineTo(100,300).closePath();
+
+            const sprite = this.add.follower(path, 100, 100, "name"); // where name is a sprite
+         */
+        let tex;
         switch (this.round) {
-            case 0:
+            case 1:
+                tex = "enemy1";
                 break;
-            case 0:
+            case 2:
+                tex = "enemy2";
                 break;
-            case 0:
+            case 3:
+                tex = "enemy3";
                 break;
-            case 0:
+            case 4:
+                tex = "enemy4";
+                break;
+            default:
+                tex = "enemy4";
                 break;
         }
 
-
-
         for (let a = 0; a < e_count; a++) {
-            const e = new Enemy(this, 100 * a, 0, t)
+            let start = 100 * a;
+            const path = new Phaser.Curves.Path(start,0);
+            path.lineTo(start + 400, 400).lineTo(start + 800, 200).line(start, 400).closePath();
+            const e = new Enemy(this, path, 100 * a, 0, tex, this.player.attack_angle, time);
+            /**
+             * e.setScale(0.5);
+            Phaser.Math.RotateAround(e, 0, 0, Phaser.Math.DegToRad(angle));
+            this.enemy_group.add(e);
+            this.physics.add.existing(e);
+             */
+            e.setScale(0.2,0.2);
+            this.enemies.add(e); // 
+            this.physics.add.existing(e);
         }
 
 
@@ -278,7 +300,7 @@ export class Playing extends Phaser.Scene {
         sp.setScale(0.2,0.2);
         sp.hp = 30;
         sp.damage = 15; // for when it hits the player
-        this.add.existing(sp);
+        //this.add.existing(sp); // shouldnt need to happen
         this.physics.add.existing(sp);
 
         this.meteors.add(sp);
@@ -375,7 +397,7 @@ export class Playing extends Phaser.Scene {
         s.setScale(scale,scale);
         s.speed_scale = scale;
         s.setDepth(0);
-        this.add.existing(s);
+        this.add.existing(s); // this is necessary here because no group
         //background_layer.add(s);
 
         this.planet_list.push(s);
