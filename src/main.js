@@ -1,4 +1,6 @@
 import { Start } from './scenes/Start.js';
+import { Playing } from "./scenes/Playing.js"
+import { Endgame } from './scenes/Endgame.js';
 // import any other scene that is defined
 
 const config = {
@@ -12,7 +14,7 @@ const config = {
     pixelArt: true,
     physics: {default: "arcade"}, // physics is not defined 
     scene: [
-        Start // future would have title screen, playing, endgame
+        Start, Playing, Endgame // future would have title screen, playing, endgame
     ],
     scale: {
         mode: Phaser.Scale.FIT,
