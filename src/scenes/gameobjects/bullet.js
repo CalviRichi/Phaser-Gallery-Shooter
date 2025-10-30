@@ -1,8 +1,23 @@
 export class Bullet extends Phaser.GameObjects.Sprite {
-    constructor(scene, x, y, direction, speed, damage) {
-        super(scene, x, y, "projectile"); // because the scene is supplied and "projectile" is loaded in the scene, this works
+    constructor(scene, x, y, direction, speed, damage, which) {
+        super(scene, x, y, which); // because the scene is supplied and "projectile" is loaded in the scene, this works
 
-        this.setScale(0.2, 0.2);
+        // damage and speed
+
+        switch (which) {
+            case "bullet":
+                this.type = "bullet";
+                this.speed = speed;
+                this.damage = damage;
+                this.setScale(0.1, 0.1);
+                break;
+            case "missile": // something like this
+                this.type = "missile";
+                this.speed = speed / 2;
+                this.damage = damage * 3;
+                this.setScale(0.15, 0.15);
+                break;
+        }
 
         scene.add.existing(this);
         scene.physics.add.existing(this);
@@ -10,8 +25,7 @@ export class Bullet extends Phaser.GameObjects.Sprite {
 
         this.scene = scene;
         this.last_time = this.scene.time.now;
-        this.speed = speed;
-        this.damage = damage;
+       
         this.scene.time.delayedCall(10000, () => this.destroy());
     }
 

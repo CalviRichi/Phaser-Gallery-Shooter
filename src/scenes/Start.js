@@ -14,7 +14,7 @@ export class Start extends Phaser.Scene {
         this.load.image('ship_3', "assets/spaceShips_003.png");
         // load ship 1, 2, 3
         this.load.image('bullet', "assets/spaceRocketParts_002.png");
-        this.load.image("rocket", "assets/spaceRocketParts_001.png")
+        this.load.image("missile", "assets/spaceRocketParts_001.png")
         // bullets and rockets  
         this.load.image("planet0", "assets/planet00.png");
         this.load.image("planet1", "assets/planet01.png");
@@ -31,6 +31,11 @@ export class Start extends Phaser.Scene {
         this.load.image("star2", "assets/star_medium.png");
         this.load.image("star3", "assets/star_small.png");
         this.load.image("star4", "assets/star_tiny.png");
+
+        this.load.image("enemy1", "assets/shipBlue_manned.png");
+        this.load.image("enemy2", "assets/shipGreen_manned.png");
+        this.load.image("enemy3", "assets/shipPink_manned.png");
+        this.load.image("enemy4", "assets/shipYellow_manned.png");
     }
 
     create() {

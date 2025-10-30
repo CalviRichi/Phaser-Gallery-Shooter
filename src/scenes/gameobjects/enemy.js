@@ -10,20 +10,28 @@ export class Enemy extends Phaser.GameObjects.PathFollower {
 
         super(scene, x, y, which);
 
+        // enemy specific stats
         switch(which) { // rather than pass in 1000,000 variables, the sprite will determine the stats
-            
+            case "enemy1":
+                this.speed = speed;
+                this.attack_rate = attack_rate;
+                this.bullet_speed = bullet_speed;
+                this.damage = damage;
+                break;
+            case "enemy2":
+                break;
+            case "enemy3":
+                break;
+            case "enemy4":
+                break;
         }
 
+        //general stats
         scene.add.existing(this);
         scene.physics.add.existing(this);
         this.direction = Phaser.Math.DegToRad(direction);
-
         this.scene = scene;
-        this.speed = speed;
         this.rotation = this.direction;
-        this.attack_rate = attack_rate;
-        this.bullet_speed = bullet_speed;
-        this.damage = damage;
         this.last_attack = time + Math.random()*this.attack_rate;
         
     }
