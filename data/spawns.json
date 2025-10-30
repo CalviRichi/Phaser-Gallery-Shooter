@@ -1,0 +1,13 @@
+[
+    {
+        "sprite": "",
+        "name": "Metal Gear",
+        "description": "You would think it would be a little more imposing, given the name...",
+        "count": 10,
+        "speed": 200,
+        "attack_rate": 8000,
+        "bullet_speed": 800,
+        "damage": 5,
+        "target": "player"
+    }
+]
