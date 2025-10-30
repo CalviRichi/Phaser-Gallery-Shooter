@@ -16,7 +16,7 @@ export class Enemy extends Phaser.GameObjects.PathFollower {
             case "enemy1":
                 this.speed = 200;
                 this.hp = 5; // will die in one bullet hit
-                this.attack_rate = 8000;
+                this.attack_rate = 800; // lower the faster
                 this.bullet_speed = 800;
                 this.damage = 5;
                 break;
@@ -43,21 +43,33 @@ export class Enemy extends Phaser.GameObjects.PathFollower {
                 break;
         }
 
-
         //general stats
         scene.add.existing(this);
         scene.physics.add.existing(this);
+
         this.direction = Phaser.Math.DegToRad(direction);
         this.scene = scene;
         this.rotation = this.direction;
         this.last_attack = time + Math.random()*this.attack_rate;
 
+        const pathLength = this.path.getLength();
+        const duration = (pathLength / this.speed) * 1000; // ms
+
+        this.startFollow({
+            duration: duration,
+            repeat: -1,
+            yoyo: true,
+            rotateToPath: false
+        });
+
         // ALL OF THIS IS FINE
         
     }
     preUpdate(time, delta) { // this function is called during the update of the game loop
+
+        super.preUpdate(time, delta);
         let dt = delta / 1000;
-        
+        /*
         const dx = this.target.x - this.x;
         const dy = this.target.y - this.y;
         const angle = Math.atan2(dy,dx);
@@ -66,11 +78,20 @@ export class Enemy extends Phaser.GameObjects.PathFollower {
             this.x += Math.cos(angle)*this.speed*dt;
             this.x += Math.sin(angle)*this.speed*dt;
         } 
+        */
         if (this.last_attack + this.attack_rate < time) {
-            this.last_attack = time;
-            let b = new Bullet(this.scene, this.x, this.y, this.angle+180, this.bullet_speed, this.damage);
-            this.scene.enemy_bullets.add(b);
-        }
+        this.last_attack = time;
+        let b = new Bullet(
+            this.scene,
+            this.x,
+            this.y,
+            90,
+            this.bullet_speed,
+            this.damage,
+            "bullet"
+        );
+        this.scene.enemies_bullet_list.add(b);
+    }
     }
  }
 

@@ -47,6 +47,7 @@ export class Playing extends Phaser.Scene {
         this.enemies = this.add.group("enemies");
         this.enemies_bullet_list = this.add.group("enemies_bullet_list");
         this.meteors = this.add.group("meteors");
+        this.player_bullet_list = this.add.group("player_bullet_list");
 
         //const background_layer = this.add.layer();
         //background_layer.add(this.planet_list);
@@ -92,7 +93,7 @@ export class Playing extends Phaser.Scene {
 
         if (this.metor_timer > 8) {
             this.metor_timer = 0;
-            if (this.meteors.length < 4) {
+            if (this.meteors.children.entries.length < 4) {
                 this.addMeteor();
             }
         }
@@ -108,13 +109,13 @@ export class Playing extends Phaser.Scene {
 
         if (Phaser.Input.Keyboard.JustDown(this.b)) { // one bullet fired per press of space
             let bullet = new Bullet(this, this.player.x, this.player.y, this.player.attack_angle, this.player.bullet_speed, this.player.damage, "bullet"); // angle + i*90
-            this.player.bullet_list.add(bullet);
+            this.player_bullet_list.add(bullet);
         }
         if (Phaser.Input.Keyboard.JustDown(this.m) && this.can_fire_missile) {
             this.can_fire_missile = false;
             this.missile_timer = 0;
             let missile = new Bullet(this, this.player.x, this.player.y, this.player.attack_angle, this.player.bullet_speed, this.player.damage, "missile");
-            this.player.bullet_list.add(missile);
+            this.player_bullet_list.add(missile);
         }
 
         // ---------------------------------------------------------------------------------------
@@ -130,17 +131,18 @@ export class Playing extends Phaser.Scene {
 
         // physics
         //checking player bullets colliding with enemies
-        this.physics.world.overlap(this.player.bullet_list, this.enemies, (b,e) => {
-            b.destroy(true); e.hp-=b.damage; 
+        this.physics.world.overlap(this.player_bullet_list, this.enemies, (b,e) => {
+            b.destroy(true); e.hp-=b.damage; console.log(e.hp);
             let tex = "damage_meteor";
             let collide = this.add.sprite(b.x, b.y, tex);
-            delayedCall(500, () => {collide.destroy(true)});
-            if (e.hp <= 0) {this.player.score++; this.checkLevelUp(); }});
+            collide.setScale(0.2,0.2);
+            this.time.delayedCall(500, () => {collide.destroy(true)});
+            if (e.hp <= 0) {e.destroy(true); this.player.score++; this.checkLevelUp(); }});
         
         // checking enemy bullets colliding with player
         this.physics.world.overlap(this.player, this.enemies_bullet_list, (p,b) => { p.hp -= b.damage; b.destroy(true); 
             let tex;
-            switch(e.damage) { // 5, 7 , 12, 18
+            switch(b.damage) { // 5, 7 , 12, 18
                 case 5:
                     tex = "damage_enemy1";
                     break;
@@ -155,8 +157,9 @@ export class Playing extends Phaser.Scene {
                     break;
             }
             let collision = this.add.sprite(b.x, b.y, tex);
+            collision.setScale(0.2,0.2);
 
-            delayedCall(500, () => {collision.destroy(true)});
+            this.time.delayedCall(500, () => {collision.destroy(true)});
             this.checkEndGame(); });
         
         // checking enemies colliding with player (arcade rules, player loses health)
@@ -177,7 +180,7 @@ export class Playing extends Phaser.Scene {
                     break;
             }
             let collision = this.add.sprite(b.x, b.y, tex);
-            delayedCall(500, () => {collision.destroy(true)});
+            this.time.delayedCall(500, () => {collision.destroy(true)});
             this.player.tint = 0xff0000; // copies from the demo game
             this.time.delayedCall(500, () => { this.player.tint = 0xffffff; });
             e.destroy(true); this.checkEndGame(); });
@@ -185,19 +188,23 @@ export class Playing extends Phaser.Scene {
 
         // checking meteors colliding with player (player loses health)
         this.physics.world.overlap(this.player, this.meteors, (p, m) => {p.hp -= m.damage; 
-            
+            //console.log("player health: " + this.player.hp);
             let tex = "damage_meteor"; // texture of collision, there are 4 textures
-            b.destroy(true); let collide = this.add.sprite(b.x, b.y, tex);
-            delayedCall(500, () => {collide.destroy(true)});
+            m.destroy(true); let collide = this.add.sprite(m.x, m.y, tex);
+            this.player.tint = 0xff0000; // copies from the demo game
+            this.time.delayedCall(500, () => { this.player.tint = 0xffffff; });
+            collide.setScale(0.2,0.2);
+            this.time.delayedCall(500, () => {collide.destroy(true)});
             m.destroy(true); this.checkEndGame(); });
         // meteors should do a good bit of damage
 
         // checking player bullets colliding with meteors
-        this.physics.world.overlap(this.player.bullet_list, this.meteors, (b,m) => {
+        this.physics.world.overlap(this.player_bullet_list, this.meteors, (b,m) => {
             
             let tex = "damage_meteor"; // texture of collision, there are 4 textures
             let collide = this.add.sprite(b.x, b.y, tex);
-            delayedCall(500, () => {collide.destroy(true)});
+            collide.setScale(0.2,0.2);
+            this.time.delayedCall(500, () => {collide.destroy(true)});
             
             if (b.type == "missile") {
                 m.destroy(true); b.destroy(true); 
@@ -254,17 +261,19 @@ export class Playing extends Phaser.Scene {
         for (let a = 0; a < e_count; a++) {
             let start = 100 * a;
             const path = new Phaser.Curves.Path(start,0);
-            path.lineTo(start + 400, 400).lineTo(start + 800, 200).line(start, 400).closePath();
-            const e = new Enemy(this, path, 100 * a, 0, tex, this.player.attack_angle, time);
+            path.lineTo(start + 400, 400).lineTo(start + 800, 200).lineTo(start, 400).closePath();
+            const e = new Enemy(this, path, 100 * a + 20, 20, tex, this.player.attack_angle + 90, time);
             /**
              * e.setScale(0.5);
             Phaser.Math.RotateAround(e, 0, 0, Phaser.Math.DegToRad(angle));
             this.enemy_group.add(e);
             this.physics.add.existing(e);
              */
+            e.setDepth(10);
             e.setScale(0.2,0.2);
             this.enemies.add(e); // 
-            this.physics.add.existing(e);
+            //this.add.existing(e);
+            //this.physics.add.existing(e);
         }
 
 
@@ -274,6 +283,7 @@ export class Playing extends Phaser.Scene {
 
     addMeteor() { // meteors are like enemies but need missiles
                     // very similar functionally to add planet
+        console.log("meteor");
         let t = Math.floor(Math.random() * 4);
         switch (t) {
             case 0:
@@ -293,14 +303,15 @@ export class Playing extends Phaser.Scene {
         let x = Math.floor(Math.random() * 1200) + 40;
         let y = -35;
 
-        let sc = Math.random() * 0.15;
+        let sp = this.add.sprite(x, y, t);
 
-        let sp = this.add.sprite(x, y, sc);
-
-        sp.setScale(0.2,0.2);
+        
+        sp.scale = Math.random() * 0.5 + 0.1;
+        sp.setScale(sp.scale,sp.scale);
+        sp.setDepth(10);
         sp.hp = 30;
         sp.damage = 15; // for when it hits the player
-        //this.add.existing(sp); // shouldnt need to happen
+        this.add.existing(sp); // shouldnt need to happen
         this.physics.add.existing(sp);
 
         this.meteors.add(sp);
@@ -388,11 +399,18 @@ export class Playing extends Phaser.Scene {
 
         let scale;
         if (pl_or_star) { // if it is a planet
-            scale = Math.random() * 0.15;
+                scale = Math.random() * 0.11;
         }
         else {
-            scale = Math.random() * 0.3;
+            if (sp == "star1" || sp == "star2") {
+                scale = 0.1 // Math.random() * 0.15;
+            }
+            else 
+                scale = Math.random() * 0.3;
+            
         }
+
+
 
         s.setScale(scale,scale);
         s.speed_scale = scale;
@@ -412,6 +430,9 @@ export class Playing extends Phaser.Scene {
                 this.planet_list[p].destroy(true);
                 this.planet_list.splice(p,1);
             }
+        }
+        for (const m of this.meteors.getChildren()) {
+            m.y += (1 / m.scale);
         }
     }
     checkLevelUp() {

@@ -16,7 +16,7 @@ export class Player extends Phaser.GameObjects.Sprite {
         this.score = 0;
         this.level = 1;
         this.attack_angle = 270; // always
-        this.bullet_list = this.add.group("bullet_list");
+        
 
         switch (mode) {
             case "ship_1": // easy

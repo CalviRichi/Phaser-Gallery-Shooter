@@ -23,6 +23,8 @@ export class Bullet extends Phaser.GameObjects.Sprite {
         scene.physics.add.existing(this);
         this.direction = Phaser.Math.DegToRad(direction);
 
+        this.rotation = this.direction + Phaser.Math.DegToRad(90);
+
         this.scene = scene;
         this.last_time = this.scene.time.now;
        
@@ -33,8 +35,8 @@ export class Bullet extends Phaser.GameObjects.Sprite {
         let dt = (time - this.last_time)/1000;
         this.last_time = time;
 
-        this.x += Math.cos(this.direction)*this.speed*dt;
-        this.y += Math.sin(this.direction)*this.speed*dt;
+        //this.x += this.speed*dt;
+        this.y += Math.sin(this.direction)*this.speed*dt
         //this.rotation += 15*dt;
     }
 }
