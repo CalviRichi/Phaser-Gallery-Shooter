@@ -7,7 +7,13 @@ import { Bullet } from "./bullet.js"
 
 export class Enemy extends Phaser.GameObjects.PathFollower {
     constructor(scene, x, y, which, direction, speed, attack_rate, bullet_speed, damage, target, time) {
+
         super(scene, x, y, which);
+
+        switch(which) { // rather than pass in 1000,000 variables, the sprite will determine the stats
+            
+        }
+
         scene.add.existing(this);
         scene.physics.add.existing(this);
         this.direction = Phaser.Math.DegToRad(direction);

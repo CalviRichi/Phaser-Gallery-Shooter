@@ -11,8 +11,9 @@ export class Start extends Phaser.Scene {
         // this.load.spritesheet("monster", "filepath", {"framewidth": 64}); // supposedly how you add a spritesheet
         this.load.image('ship_1', "assets/spaceShips_004.png");
         // load ship 1, 2, 3
-        this.load.image('projectile', "assets/spaceRocketParts_001.png");
+        this.load.image('projectile', "assets/spaceRocketParts_002.png");
         // bullets and rockets  
+        this.load.image("planet", "assets/spaceShips_002.png");
     }
 
     create() {
