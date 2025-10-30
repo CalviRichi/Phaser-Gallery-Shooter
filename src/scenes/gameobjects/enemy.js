@@ -43,19 +43,6 @@ export class Enemy extends Phaser.GameObjects.PathFollower {
                 break;
         }
 
-        /*
-        {
-        "sprite": "enemy1",
-        "name": "Metal Gear",
-        "description": "You would think it would be a little more imposing, given the name...",
-        "count": 10,
-        "speed": 200,
-        "attack_rate": 8000,
-        "bullet_speed": 800,
-        "damage": 5,
-        "target": "player"
-        }
-        */
 
         //general stats
         scene.add.existing(this);
@@ -64,6 +51,8 @@ export class Enemy extends Phaser.GameObjects.PathFollower {
         this.scene = scene;
         this.rotation = this.direction;
         this.last_attack = time + Math.random()*this.attack_rate;
+
+        // ALL OF THIS IS FINE
         
     }
     preUpdate(time, delta) { // this function is called during the update of the game loop

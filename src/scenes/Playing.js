@@ -93,6 +93,13 @@ export class Playing extends Phaser.Scene {
             this.can_fire_missile = true;
         }
 
+        if (this.metor_timer > 8) {
+            this.metor_timer = 0;
+            if (this.meteors.length < 4) {
+                this.addMeteor();
+            }
+        }
+
         this.backgroundScroll();
 
         // -------------------------------------------------------------------------------------
@@ -120,7 +127,7 @@ export class Playing extends Phaser.Scene {
         if (this.enemies.children.entries.length == 0)
         {
             this.addEnemies();
-            //this.wave++;
+            //this.round++;
         }
 
         // physics
@@ -191,11 +198,16 @@ export class Playing extends Phaser.Scene {
         this.physics.world.overlap(this.player.bullet_list, this.meteors, (b,m) => {
             
             let tex = "damage_meteor"; // texture of collision, there are 4 textures
-            b.destroy(true); let collide = this.add.sprite(b.x, b.y, tex);
+            let collide = this.add.sprite(b.x, b.y, tex);
             delayedCall(500, () => {collide.destroy(true)});
             
             if (b.type == "missile") {
-                m.destroy(true); b.destroy(true);
+                m.destroy(true); b.destroy(true); 
+                this.player.score += 2; this.checkLevelUp();
+            }
+            else {
+                m.hp -= b.damage; if (m.hp <= 0) {m.destroy(true);}
+                b.destroy(true); 
                 this.player.score += 2; this.checkLevelUp();
             }
             
@@ -214,7 +226,20 @@ export class Playing extends Phaser.Scene {
         let e_count = 3;
         e_count += this.round * 4;
 
-        let t = "enemy1";
+        // PATH LOGIC NEEDS TO GO HERE
+
+        switch (this.round) {
+            case 0:
+                break;
+            case 0:
+                break;
+            case 0:
+                break;
+            case 0:
+                break;
+        }
+
+
 
         for (let a = 0; a < e_count; a++) {
             const e = new Enemy(this, 100 * a, 0, t)
@@ -227,6 +252,37 @@ export class Playing extends Phaser.Scene {
 
     addMeteor() { // meteors are like enemies but need missiles
                     // very similar functionally to add planet
+        let t = Math.floor(Math.random() * 4);
+        switch (t) {
+            case 0:
+                t = "meteor1";
+                break;
+            case 1:
+                t = "meteor2";
+                break;
+            case 2:
+                t = "meteor3";
+                break;
+            case 3:
+                t = "meteor4";
+                break;
+        }
+
+        let x = Math.floor(Math.random() * 1200) + 40;
+        let y = -35;
+
+        let sc = Math.random() * 0.15;
+
+        let sp = this.add.sprite(x, y, sc);
+
+        sp.setScale(0.2,0.2);
+        sp.hp = 30;
+        sp.damage = 15; // for when it hits the player
+        this.add.existing(sp);
+        this.physics.add.existing(sp);
+
+        this.meteors.add(sp);
+        
     }
 
     addPlanet() {
@@ -319,6 +375,7 @@ export class Playing extends Phaser.Scene {
         s.setScale(scale,scale);
         s.speed_scale = scale;
         s.setDepth(0);
+        this.add.existing(s);
         //background_layer.add(s);
 
         this.planet_list.push(s);

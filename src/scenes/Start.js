@@ -43,6 +43,11 @@ export class Start extends Phaser.Scene {
         this.load.image("damage_enemy3", "assets/laserPink_burst.png");
         this.load.image("damage_enemy4", "assets/laserYellow_burst.png");
 
+        this.load.image("meteor1", "assets/spaceMeteors_001.png");
+        this.load.image("meteor2", "assets/spaceMeteors_002.png");
+        this.load.image("meteor3", "assets/spaceMeteors_003.png");
+        this.load.image("meteor4", "assets/spaceMeteors_004.png");
+
     }
 
     create() {
