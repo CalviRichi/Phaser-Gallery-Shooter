@@ -14,30 +14,30 @@ export class Enemy extends Phaser.GameObjects.PathFollower {
         switch(which) { // rather than pass in 1000,000 variables, the sprite will determine the stats
             // damage scales by 1.5
             case "enemy1":
-                this.speed = 200;
+                this.speed = 150;
                 this.hp = 5; // will die in one bullet hit
-                this.attack_rate = 800; // lower the faster
-                this.bullet_speed = 800;
+                this.attack_rate = 2500; // lower the faster
+                this.bullet_speed = 400;
                 this.damage = 5;
                 break;
             case "enemy2":
                 this.speed = 250;
                 this.hp = 8; 
-                this.attack_rate = 8500;
+                this.attack_rate = 2000;
                 this.bullet_speed = 800;
                 this.damage = 7;
                 break;
             case "enemy3":
                 this.speed = 300;
                 this.hp = 12; 
-                this.attack_rate = 9000;
+                this.attack_rate = 1500;
                 this.bullet_speed = 800;
                 this.damage = 12;
                 break;
             case "enemy4": // needs missiles 
                 this.speed = 220;
                 this.hp = 15; 
-                this.attack_rate = 1200;
+                this.attack_rate = 2000;
                 this.bullet_speed = 1000;
                 this.damage = 18;
                 break;
@@ -51,16 +51,12 @@ export class Enemy extends Phaser.GameObjects.PathFollower {
         this.scene = scene;
         this.rotation = this.direction;
         this.last_attack = time + Math.random()*this.attack_rate;
+        this.attack_rate += Math.floor(Math.random() * 101) - 50;
 
         const pathLength = this.path.getLength();
         const duration = (pathLength / this.speed) * 1000; // ms
 
-        this.startFollow({
-            duration: duration,
-            repeat: -1,
-            yoyo: true,
-            rotateToPath: false
-        });
+        
 
         // ALL OF THIS IS FINE
         

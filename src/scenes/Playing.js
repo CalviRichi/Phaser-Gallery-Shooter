@@ -53,6 +53,7 @@ export class Playing extends Phaser.Scene {
         //background_layer.add(this.planet_list);
 
         this.round = 0;
+        this.in_round = true;
 
         this.left = this.input.keyboard.addKey("A", false, true);
         this.right = this.input.keyboard.addKey("D", false, true);
@@ -64,7 +65,23 @@ export class Playing extends Phaser.Scene {
         this.can_fire_missile = false;
 
         this.metor_timer = 0;
-        
+
+        this.initial_enemy_count = 0;
+
+        this.round_announcement = this.add.text(300,300,"", {
+            fontSize: '32px',
+            fill: '#FFF',
+            align: 'center'
+        });
+        this.round_announcement.setOrigin(0.5,0.5);
+
+        this.player_stats = this.add.text(100, 600, "HEALTH: " + this.player.hp + 
+            " - - - Enemies Remaining: " + this.enemies.children.entries.length + "/" + this.initial_enemy_count, {
+            fontSize: "16px",
+            fill: '#FFF',
+            align: "center"
+        });
+        this.player_stats.setOrigin(0,0.5);
         // most likely use , and . for bullets and missiles
     }
 
@@ -91,7 +108,7 @@ export class Playing extends Phaser.Scene {
             this.can_fire_missile = true;
         }
 
-        if (this.metor_timer > 8) {
+        if (this.metor_timer > 5) {
             this.metor_timer = 0;
             if (this.meteors.children.entries.length < 4) {
                 this.addMeteor();
@@ -122,10 +139,24 @@ export class Playing extends Phaser.Scene {
 
         // WORLD LOGIC
 
-        if (this.enemies.children.entries.length == 0)
+        if (this.enemies.children.entries.length == 0 && this.in_round)
         {
+            /**
+             * this.title_text = this.add.text(640, 100, "WELCOME TO THE GAME!!!", { fontSize: '64px', fill: '#FFF', align: "center" });
+                this.title_text.setOrigin(0.5, 0.5);
+             */
             this.round++;
-            this.addEnemies(time);
+            this.in_round = false;
+            this.initial_enemy_count = 0;
+            // delayed call to announce enemy wave, delayed call to actually add the enemies 
+            this.round_announcement.text = "Begin Round: " + this.round;
+            this.time.delayedCall(5000, () => {
+                this.round_announcement.text = "";
+                this.addEnemies(time);
+                this.in_round = true;
+            });
+
+            
             
         }
 
@@ -217,6 +248,10 @@ export class Playing extends Phaser.Scene {
             }
             
         }); // maybe if instead the type is bullet there is a little collision animation
+
+
+        this.player_stats.text = "HEALTH: " + this.player.hp + 
+            " - - - Enemies Remaining: " + this.enemies.children.entries.length + "/" + this.initial_enemy_count;
     }
 /*
   
@@ -259,9 +294,11 @@ export class Playing extends Phaser.Scene {
         }
 
         for (let a = 0; a < e_count; a++) {
+          
             let start = 100 * a;
             const path = new Phaser.Curves.Path(start,0);
             path.lineTo(start + 400, 400).lineTo(start + 800, 200).lineTo(start, 400).closePath();
+            
             const e = new Enemy(this, path, 100 * a + 20, 20, tex, this.player.attack_angle + 90, time);
             /**
              * e.setScale(0.5);
@@ -269,14 +306,31 @@ export class Playing extends Phaser.Scene {
             this.enemy_group.add(e);
             this.physics.add.existing(e);
              */
+            
             e.setDepth(10);
             e.setScale(0.2,0.2);
             this.enemies.add(e); // 
+
+
+            const pathLength = e.path.getLength();
+            const duration = (pathLength / e.speed) * 1000; // ms
+            
+            this.time.delayedCall(a * 1000, () => {
+
+                e.startFollow({
+                    duration: duration,
+                    repeat: -1,
+                    yoyo: true,
+                    rotateToPath: false
+                });
+            });
+            
+            
             //this.add.existing(e);
             //this.physics.add.existing(e);
         }
 
-
+        this.initial_enemy_count = this.enemies.children.entries.length;
 
 
     }
