@@ -1,5 +1,6 @@
 import { Bullet } from "./gameobjects/bullet.js";
 import { Enemy  } from "./gameobjects/enemy.js";
+import { Player } from "./gameobjects/player.js";
 
 export class Start extends Phaser.Scene {
 
@@ -10,9 +11,11 @@ export class Start extends Phaser.Scene {
     preload() {
         // this is just for loading assets
         this.load.image('background', 'assets/bg.png'); // loading in assets used by the game 
-       // this.load.spritesheet("monster", "filepath", {"framewidth": 64}); // supposedly how you add a spritesheet
-        this.load.image('player_ship', "assets/spaceShips_004.png");
+        // this.load.spritesheet("monster", "filepath", {"framewidth": 64}); // supposedly how you add a spritesheet
+        this.load.image('ship_1', "assets/spaceShips_004.png");
+        // load ship 1, 2, 3
         this.load.image('projectile', "assets/spaceRocketParts_001.png");
+        // bullets and rockets  
     }
 
     create() {
@@ -21,21 +24,12 @@ export class Start extends Phaser.Scene {
         const path = new Phaser.Curves.Path(100,100);
         path.lineTo(400,100).lineTo(400,300).lineTo(100,300).closePath();
 
-        //const sprite = this.add.follower(path, 100,100, "name"); // where name is a 
-
+        //const sprite = this.add.follower(path, 100, 100, "name"); // where name is a sprite
         //this.background = this.add.sprite(640, 320, 'background');
-        this.player = this.add.sprite(640, 620, "player_ship");
-        
-        this.player.setScale(0.35, 0.35); // size of the sprite
-        this.physics.add.existing(this.player);
-        
-        this.player.score = 0;
-        this.player.hp = 100; // health
-        this.player.speed = 300; // how fast the ship moves
-        this.player.attack_angle = 270; // straight up
-        this.player.bullet_speed = 1000;
-        //this.player_bullets ...
 
+
+
+        this.player = new Player(this, 640, 620, "ship_1"); // using my player class
 
         this.last_time = 0;
 

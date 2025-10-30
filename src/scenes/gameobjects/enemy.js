@@ -5,8 +5,6 @@ import { Bullet } from "./bullet.js"
 
 // 
 
-
-
 export class Enemy extends Phaser.GameObjects.PathFollower {
     constructor(scene, x, y, which, direction, speed, attack_rate, bullet_speed, damage, target, time) {
         super(scene, x, y, which);
