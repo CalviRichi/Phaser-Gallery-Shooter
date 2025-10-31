@@ -14,7 +14,7 @@ export class Enemy extends Phaser.GameObjects.PathFollower {
         switch(which) { // rather than pass in 1000,000 variables, the sprite will determine the stats
             // damage scales by 1.5
             case "enemy1":
-                this.speed = 150;
+                this.speed = 200;
                 this.hp = 5; // will die in one bullet hit
                 this.attack_rate = 2500; // lower the faster
                 this.bullet_speed = 400;
@@ -30,16 +30,16 @@ export class Enemy extends Phaser.GameObjects.PathFollower {
             case "enemy3":
                 this.speed = 300;
                 this.hp = 12; 
-                this.attack_rate = 1500;
+                this.attack_rate = 1700;
                 this.bullet_speed = 800;
-                this.damage = 12;
+                this.damage = 10;
                 break;
             case "enemy4": // needs missiles 
                 this.speed = 220;
                 this.hp = 15; 
                 this.attack_rate = 2000;
                 this.bullet_speed = 1000;
-                this.damage = 18;
+                this.damage = 12;
                 break;
         }
 
@@ -56,7 +56,7 @@ export class Enemy extends Phaser.GameObjects.PathFollower {
         const pathLength = this.path.getLength();
         const duration = (pathLength / this.speed) * 1000; // ms
 
-        
+        this.can_fire = false;
 
         // ALL OF THIS IS FINE
         
@@ -75,7 +75,7 @@ export class Enemy extends Phaser.GameObjects.PathFollower {
             this.x += Math.sin(angle)*this.speed*dt;
         } 
         */
-        if (this.last_attack + this.attack_rate < time) {
+        if (this.last_attack + this.attack_rate < time && this.can_fire) {
         this.last_attack = time;
         let b = new Bullet(
             this.scene,
@@ -87,7 +87,7 @@ export class Enemy extends Phaser.GameObjects.PathFollower {
             "bullet"
         );
         this.scene.enemies_bullet_list.add(b);
-    }
+        }
     }
  }
 

@@ -29,7 +29,7 @@ export class Player extends Phaser.GameObjects.Sprite {
                 this.hp = 75;
                 this.speed = 450;
                 this.damage = 4;
-                this.bullet_speed = 100;
+                this.bullet_speed = 1000;
                 break;
             case "ship_3":
                 this.hp = 50;

@@ -26,6 +26,10 @@ export class Playing extends Phaser.Scene {
        
     }
 
+    init(data) {
+        this.difficulty = data;
+    }
+
     preload() {
         
     }
@@ -36,7 +40,7 @@ export class Playing extends Phaser.Scene {
         
         //this.background = this.add.sprite(640, 320, 'background');
 
-        this.player = new Player(this, 640, 620, "ship_1"); // using my player class
+        this.player = new Player(this, 640, 620, this.difficulty); // using my player class
         this.player.setDepth(10);
 
         this.last_time = 0;
@@ -75,8 +79,16 @@ export class Playing extends Phaser.Scene {
         });
         this.round_announcement.setOrigin(0.5,0.5);
 
+        this.round_note = this.add.text(640,400, "", {
+            fontSize: "20px",
+            fill: "#FFF",
+            align: "center"
+        });
+        this.round_note.setOrigin(0.5,0.5);
+
         this.player_stats = this.add.text(100, 600, "HEALTH: " + this.player.hp + 
-            " - - - Enemies Remaining: " + this.enemies.children.entries.length + "/" + this.initial_enemy_count, {
+            " - - - Enemies Remaining: " + this.enemies.children.entries.length + "/" + this.initial_enemy_count +
+            " - - - Score: " + this.player.score, {
             fontSize: "16px",
             fill: '#FFF',
             align: "center"
@@ -146,12 +158,15 @@ export class Playing extends Phaser.Scene {
                 this.title_text.setOrigin(0.5, 0.5);
              */
             this.round++;
+            this.checkEndGame();
             this.in_round = false;
             this.initial_enemy_count = 0;
             // delayed call to announce enemy wave, delayed call to actually add the enemies 
             this.round_announcement.text = "Begin Round: " + this.round;
+            this.round_note.text = "B to fire bullet, M for missile... (beware of the meteors)";
             this.time.delayedCall(5000, () => {
                 this.round_announcement.text = "";
+                this.round_note.text = "";
                 this.addEnemies(time);
                 this.in_round = true;
             });
@@ -210,7 +225,7 @@ export class Playing extends Phaser.Scene {
                     tex = "damage_enemy4";
                     break;
             }
-            let collision = this.add.sprite(b.x, b.y, tex);
+            let collision = this.add.sprite(e.x, e.y, tex);
             this.time.delayedCall(500, () => {collision.destroy(true)});
             this.player.tint = 0xff0000; // copies from the demo game
             this.time.delayedCall(500, () => { this.player.tint = 0xffffff; });
@@ -251,7 +266,8 @@ export class Playing extends Phaser.Scene {
 
 
         this.player_stats.text = "HEALTH: " + this.player.hp + 
-            " - - - Enemies Remaining: " + this.enemies.children.entries.length + "/" + this.initial_enemy_count;
+            " - - - Enemies Remaining: " + this.enemies.children.entries.length + "/" + this.initial_enemy_count +
+            " - - - Score: " + this.player.score;
     }
 /*
   
@@ -264,7 +280,7 @@ export class Playing extends Phaser.Scene {
         The enemy constructor, using the enemy type, will determine the enemy stats
         */
         let e_count = 3;
-        e_count += this.round * 4;
+        e_count += this.round * 3;
 
         // PATH LOGIC NEEDS TO GO HERE
 
@@ -294,35 +310,47 @@ export class Playing extends Phaser.Scene {
         }
 
         for (let a = 0; a < e_count; a++) {
-          
-            let start = 100 * a;
-            const path = new Phaser.Curves.Path(start,0);
-            path.lineTo(start + 400, 400).lineTo(start + 800, 200).lineTo(start, 400).closePath();
+
+            // make a few different kind of paths
             
-            const e = new Enemy(this, path, 100 * a + 20, 20, tex, this.player.attack_angle + 90, time);
-            /**
-             * e.setScale(0.5);
-            Phaser.Math.RotateAround(e, 0, 0, Phaser.Math.DegToRad(angle));
-            this.enemy_group.add(e);
-            this.physics.add.existing(e);
-             */
+            let startX = 250 + a * 150; // horizontal spacing
+            let startY = 45;
+
+            if (startX > 900) {
+                let old_startX = startX;
+                startX-= 700 * Math.floor(startX / 900) ;
+                startY += 50 * Math.floor(old_startX / 900);
+            }
+
+            const path = new Phaser.Curves.Path(startX, startY);
+            if (tex == "enemy1" || tex == "enemy2") {
+                path.lineTo(startX + 200, 200).lineTo(startX - 150, 400).lineTo(startX + 100, 600);
+            }
+            else {
+                path.lineTo(startX, 600).lineTo(startX + 300, 300).lineTo(startX + 100, startY);
+            }
+            
+
+            const e = new Enemy(this, path, startX, startY, tex, this.player.attack_angle + 90, time);
+            
+            //const e = new Enemy(this, path, start, y_start, tex, this.player.attack_angle + 90, time);
             
             e.setDepth(10);
-            e.setScale(0.2,0.2);
+            e.setScale(0.3,0.3);
             this.enemies.add(e); // 
-
 
             const pathLength = e.path.getLength();
             const duration = (pathLength / e.speed) * 1000; // ms
-            
-            this.time.delayedCall(a * 1000, () => {
 
+            this.time.delayedCall(a * 1000, () => {
+                if (!e.active) return;
                 e.startFollow({
                     duration: duration,
                     repeat: -1,
                     yoyo: true,
                     rotateToPath: false
                 });
+                e.can_fire = true;
             });
             
             
@@ -500,7 +528,11 @@ export class Playing extends Phaser.Scene {
         if (this.player.hp <= 0)
         {
             this.scene.stop("Playing");
-            this.scene.start('Endgame');
+            this.scene.start('Endgame', [false, this.player]);
+        }
+        else if (this.round >= 5) {
+            this.scene.stop("Playing");
+            this.scene.start("Endgame", [true, this.player]);
         }
     }
 }

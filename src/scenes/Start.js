@@ -52,17 +52,67 @@ export class Start extends Phaser.Scene {
 
     create() {
         // show the title screen
-        this.title_text = this.add.text(640, 100, "WELCOME TO THE GAME!!!", { fontSize: '64px', fill: '#FFF', align: "center" });
+        this.title_text = this.add.text(640, 100, "WELCOME TO GALXIGAIAN!!!", { fontSize: '64px', fill: '#FFF', align: "center" });
         this.title_text.setOrigin(0.5, 0.5);
+        this.other_text = this.add.text(640,300, "Select difficulty: EASY, MEDIUM, HARD (A - left, D, right, SPACE - select)", {
+            fontSize: "24px",
+            fill: "#FFF",
+            align: "center"
+        });
+        this.other_text.setOrigin(0.5,0.5);
 
+        this.cursor = this.add.sprite(340,500,"bullet");
+        this.cursor.setScale(0.2,0.2);
+        this.option_1 = this.add.sprite(340,400,"ship_1");
+        this.option_1.setScale(0.2, 0.2);
+        this.option_2 = this.add.sprite(640, 400, "ship_2");
+         this.option_2.setScale(0.2, 0.2);
+        this.option_3 = this.add.sprite(940, 400, "ship_3");
+         this.option_3.setScale(0.3, 0.3);
+
+
+ 
         this.space = this.input.keyboard.addKey("SPACE", false, true);
+        this.a = this.input.keyboard.addKey("A", false, true);
+        this.d = this.input.keyboard.addKey("D", false, true);
     }
 
     update(time) {
 
         if (Phaser.Input.Keyboard.JustDown(this.space)) { // if the player presses space, start the real game
+            
+            let gameMode;
+            switch (this.cursor.x) {
+                case 340:
+                    gameMode = "ship_1";
+                    break;
+                case 640:
+                    gameMode = "ship_2";
+                    break;
+                case 940:
+                    gameMode = "ship_3";
+                    break;
+            }
+            
             this.scene.stop("Start");
-            this.scene.start('Playing');
+            this.scene.start('Playing', gameMode);
+        }
+
+        if (Phaser.Input.Keyboard.JustDown(this.a)) {
+            if (this.cursor.x > 340) {
+                this.cursor.x -= 300;
+            }
+            else {
+                this.cursor.x = 940;
+            }
+        }
+        if (Phaser.Input.Keyboard.JustDown(this.d)) {
+            if (this.cursor.x < 940) {
+                this.cursor.x += 300;
+            }
+            else {
+                this.cursor.x = 340;
+            }
         }
     }
     
