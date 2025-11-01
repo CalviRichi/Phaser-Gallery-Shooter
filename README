@@ -1,0 +1,14 @@
+Welcome to GALAXIGAIAN ... (by Calvin Richards)
+
+This is a gallery shooter very much inspired by Galaxian and Galaga (hence the name, I apologize for lack of creativity).
+The controls consist of "A" to move left, "D" to move right, "B" to shoot bullets, and "M" to shoot missiles. 
+Additionally in the title screen you press "SPACE" to select your ship / difficulty.
+
+The game has 4 enemy types with 2 movement patterns. There is a difficulty that is decided by player stats, which are chosen
+in the title screen. In addition to the enemies there are meteors which upon contact with the ship will explode and do damage. 
+I did not have enough time to add sound or sprite animations, but there are animations for when collisions occur.
+
+The game follows all of the main requirements that are laid out, in addition to that, it has a title screen that doubles as 
+a controls screen (some of the controls are shown on the next screen). There are not distinct levels but there are distinct enemy waves and difficulties that you could play at. 
+
+The scoring has not been altered, it is just based on enemies destroyed, additionally meteors count for more points. 
